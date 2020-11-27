@@ -1,0 +1,16 @@
+---
+documentclass: scrartcl
+classoption:
+  - fleqn
+  - fontsize: 11pt
+papersize: a4
+geometry:
+  - includeheadfoot
+  - left=15mm
+  - right=15mm
+  - top=10mm
+  - bottom=10mm
+header-includes: |
+  \newcommand{\lt}{<}
+  \newcommand{\gt}{>}
+---
