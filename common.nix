@@ -134,6 +134,7 @@ in {
     pkgs.tealdeer
     pkgs.tor
     pkgs.shellcheck
+    pkgs.sd
     pkgs.z-lua
     pkgs.wget
     ls-colors
@@ -141,6 +142,9 @@ in {
     pkgs.poppler_utils
 
     pkgs-20-09.ripgrep # currently broken
+
+    pkgs.litecli
+    pkgs.mycli
 
     pkgs.go
     pkgs.nodejs-15_x
@@ -152,8 +156,11 @@ in {
     pkgs.texlive.combined.scheme-medium
     pkgs.pandoc
     pandoc-pdf-template
+
+    pkgs.python3
     pkgs.python38Packages.papis
     pkgs.python38Packages.papis-python-rofi
+    pkgs.python38Packages.requests
   ];
 
   programs.direnv.enable = true;
@@ -240,12 +247,19 @@ in {
       set inccommand=split
 
       " Keyboard shortcuts
-      nnoremap <silent> <F3> :make <CR>
+      nnoremap <silent> <F3> :silent make \| redraw! <CR>
 
       " Quickfix window auto open
       " https://vim.fandom.com/wiki/Automatically_open_the_quickfix_window_on_:make
       au QuickFixCmdPost [^l]* nested cwindow
       au QuickFixCmdPOst    l* nested lwindow
+
+      " Edit vimrc from home-manager config
+      function! EditVimrc()
+        let name = execute(":filter /init.vim/ scriptnames")
+        execute(":edit " . split(name)[1])
+      endfunction
+      command! EditVimrc call EditVimrc()
 
       " latex
       let g:tex_flavor='latex'
@@ -259,7 +273,7 @@ in {
 
       " java
       autocmd FileType java :set makeprg=javac\ %
-      autocmd FileType java :set errorformat=%A:%f:%l:\ %m,%-Z%p^,%-C%.%#
+      autocmd FileType java :set errorformat=%A%f:%l:\ %m,%-Z%p^,%-C%.%#
 
     '';
     plugins = with pkgs.vimPlugins; [
@@ -345,6 +359,7 @@ in {
       EDITOR = "vim";
       PATH = "$HOME/.yarn/bin:$PATH";
       HOMEBREW_NO_ANALYTICS = "1";
+      COMPOSER_MEMORY_LIMIT="4G";
     };
 
     initExtra = ''
@@ -380,8 +395,10 @@ in {
 
       # Functions
       function pandoc-pdf {
+        title=$(grep -oP '(?<=^title: ).*' ''${1})
+        pdf_name="''${title:-''${1:r}}"
         pandoc --metadata-file=${pandoc-pdf-template}/share/pdf.yaml \
-          "''${@:2}" "$1" -o "''${1:r}.pdf" && open "''${1:r}.pdf"
+          "''${@:2}" "$1" -o "''${pdf_name}.pdf" && open "''${pdf_name}.pdf"
       }
       function cht {
         curl "https://cht.sh/''${1}" | less -R
