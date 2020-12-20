@@ -2,6 +2,7 @@
 
 let
   pkgs = import <nixpkgs> { };
+
   LS_COLORS = pkgs.fetchgit {
     url = "https://github.com/trapd00r/LS_COLORS";
     sha256 = "1vw2iy8sigkhal8b2s20db580gwg904q70b93dqnfpj5zf4pwgnq";
@@ -11,6 +12,25 @@ let
     ln -s ${pkgs.coreutils}/bin/ls $out/bin/ls
     ln -s ${pkgs.coreutils}/bin/dircolors $out/bin/dircolors
     cp ${LS_COLORS}/LS_COLORS $out/share/LS_COLORS
+  '';
+
+  pandoc-pdf-template = pkgs.writeTextDir "share/pdf.yaml" ''
+    ---
+    documentclass: scrartcl
+    classoption:
+      - fleqn
+      - fontsize: 11pt
+    papersize: a4
+    geometry:
+      - includeheadfoot
+      - left=15mm
+      - right=15mm
+      - top=10mm
+      - bottom=10mm
+    header-includes: |
+      \newcommand{\lt}{<}
+      \newcommand{\gt}{>}
+    ---
   '';
 
   pkgs-20-09 = import (fetchTarball {
@@ -81,25 +101,49 @@ in {
   # changes in each release.
   home.stateVersion = "20.09";
 
+  home.file."Library/Application Support/abnerworks.Typora/themes/base.user.css".text = ''
+    html,
+    body,
+    button,
+    input,
+    select,
+    textarea {
+      font-family: "iA Writer Duo S";
+    }
+
+    html {
+      font-size: 16px; /* not modified */
+    }
+    '';
+
   home.packages = [
+    pkgs.shellcheck
     pkgs.mtr
     pkgs.mpv
     pkgs.socat
     pkgs.tree
     pkgs.htop
     pkgs.fd
+    pkgs.jq
     pkgs.nix-prefetch-github
     pkgs.ncdu
     pkgs.httpie
+    pkgs.gnugrep
     pkgs.glances
+    pkgs.tealdeer
     pkgs.tor
     pkgs.shellcheck
+    pkgs.sd
     pkgs.z-lua
     pkgs.wget
     ls-colors
     pkgs.fzf
+    pkgs.poppler_utils
 
     pkgs-20-09.ripgrep # currently broken
+
+    pkgs.litecli
+    pkgs.mycli
 
     pkgs.go
     pkgs.nodejs-15_x
@@ -107,6 +151,15 @@ in {
     pkgs.rustup
     pkgs-20-09.php
     pkgs-20-09.php74Packages.composer
+
+    pkgs.texlive.combined.scheme-medium
+    pkgs.pandoc
+    pandoc-pdf-template
+
+    pkgs.python3
+    pkgs.python38Packages.papis
+    pkgs.python38Packages.papis-python-rofi
+    pkgs.python38Packages.requests
   ];
 
   programs.direnv.enable = true;
@@ -140,7 +193,7 @@ in {
       active_border_color = "none";
       inactive_text_alpha = "0.6";
       enabled_layouts = "vertical";
-      # macos_option_as_alt = true;
+      macos_option_as_alt = true;
     };
     keybindings = {
       "cmd+d" = "new_window_with_cwd";
@@ -183,21 +236,48 @@ in {
       colorscheme gruvbox
 
       set number
-      set autoindent  "already default in vim-sensible
+      set autoindent  " already default in vim-sensible
       set expandtab
       set backspace=2
       set shiftwidth=2
       set softtabstop=2
-
+      " set textwidth=80
       set hidden
       set modelines=0
       set scrolloff=3
-
       set smartcase
-
       set mouse=a
-
       set inccommand=split
+
+      " Keyboard shortcuts
+      nnoremap <silent> <F3> :silent make \| redraw! <CR>
+
+      " Quickfix window auto open
+      " https://vim.fandom.com/wiki/Automatically_open_the_quickfix_window_on_:make
+      au QuickFixCmdPost [^l]* nested cwindow
+      au QuickFixCmdPOst    l* nested lwindow
+
+      " Edit vimrc from home-manager config
+      function! EditVimrc()
+        let name = execute(":filter /init.vim/ scriptnames")
+        execute(":edit " . split(name)[1])
+      endfunction
+      command! EditVimrc call EditVimrc()
+
+      " latex
+      let g:tex_flavor='latex'
+      let g:vimtex_quickfix_mode=0
+      set conceallevel=1
+      let g:tex_conceal='abdmg'
+
+      " shell scripts
+      autocmd FileType sh :set makeprg=shellcheck\ -o\ all\ -f\ gcc\ %
+      autocmd Filetype sh :au BufWritePost * silent make | redraw!
+
+      " java
+      autocmd FileType java :set makeprg=javac\ %
+      autocmd FileType java :set errorformat=%A%f:%l:\ %m,%-Z%p^,%-C%.%#
+
     '';
     plugins = with pkgs.vimPlugins; [
       vim-sensible
@@ -205,6 +285,9 @@ in {
       iceberg-vim
       gruvbox
       molokai
+      vimtex
+      vim-fugitive
+      vim-dispatch
     ];
   };
 
@@ -261,6 +344,7 @@ in {
       g = "git";
       amend = "git add -A && git commit --amend --no-edit";
       grep = "grep --color=auto";
+      date = "${pkgs.coreutils}/bin/date";
       diff = "diff --color=auto";
       ls = "ls --color=auto -F ";
       l = "ls";
@@ -278,6 +362,7 @@ in {
       EDITOR = "vim";
       PATH = "$HOME/.yarn/bin:$PATH";
       HOMEBREW_NO_ANALYTICS = "1";
+      COMPOSER_MEMORY_LIMIT="4G";
     };
 
     initExtra = ''
@@ -310,6 +395,17 @@ in {
       setopt no_case_glob
       setopt auto_cd
       setopt correct_all
+
+      # Functions
+      function pandoc-pdf {
+        title=$(grep -oP '(?<=^title: ).*' ''${1})
+        pdf_name="''${title:-''${1:r}}"
+        pandoc --metadata-file=${pandoc-pdf-template}/share/pdf.yaml \
+          "''${@:2}" "$1" -o "''${pdf_name}.pdf" && open "''${pdf_name}.pdf"
+      }
+      function cht {
+        curl "https://cht.sh/''${1}" | less -R
+      }
     '';
   };
 }
