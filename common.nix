@@ -4,7 +4,7 @@ let
   pkgs = import <nixpkgs> { };
   LS_COLORS = pkgs.fetchgit {
     url = "https://github.com/trapd00r/LS_COLORS";
-    sha256 = "1qbl2w58s97q232aa6lnv7ws29n26fhff5nkdn3ip53sia50rn49";
+    sha256 = "1vw2iy8sigkhal8b2s20db580gwg904q70b93dqnfpj5zf4pwgnq";
   };
   ls-colors = pkgs.runCommand "ls-colors" { } ''
     mkdir -p $out/bin/ $out/share
@@ -67,10 +67,9 @@ in {
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 
-  # Home Manager needs a bit of information about you and the
-  # paths it should manage.
-  home.username = "user";
-  home.homeDirectory = "/Users/user";
+  # moved to specific configs
+  # home.username = "user";
+  # home.homeDirectory = "/Users/user";
 
   # This value determines the Home Manager release that your
   # configuration is compatible with. This helps avoid breakage
@@ -124,9 +123,13 @@ in {
 
   programs.kitty = {
     enable = true;
+
+    font = {
+      package = pkgs.fira-code;
+      name = "Fira Code";
+    };
     settings = lib.trivial.mergeAttrs kitty-gruvbox-dark {
-      font_family = "Fira Code";
-      font_size = 13;
+      shell = "/home/user/.nix-profile/bin/zsh";
       allow_hyperlinks = true;
       url_style = "single";
       enable_audio_bell = false;
