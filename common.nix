@@ -5,7 +5,7 @@ let
 
   LS_COLORS = pkgs.fetchgit {
     url = "https://github.com/trapd00r/LS_COLORS";
-    sha256 = "1i2pc9k1g79wvdq3w2h3ikp3s2myalcvwin2l6gmyhz5cn0xjfg8";
+    sha256 = "1cxa95qhg2x0az20rg19pc9larlgp1igl9w43bpbqqxs8m32qdka";
   };
   ls-colors = pkgs.runCommand "ls-colors" { } ''
     mkdir -p $out/bin/ $out/share
@@ -197,7 +197,7 @@ in {
       name = "Fira Code";
     };
     settings = lib.trivial.mergeAttrs kitty-gruvbox-dark {
-      shell = "/home/user/.nix-profile/bin/fish";
+      shell = "/usr/bin/zsh";
       allow_hyperlinks = true;
       url_style = "single";
       enable_audio_bell = false;
@@ -335,30 +335,6 @@ in {
     };
   };
 
-  programs.fish = {
-    enable = true;
-
-    shellAliases = {
-      amend = "git add -A && git commit --amend --no-edit";
-    };
-
-    shellAbbrs = {
-      g = "git";
-      grep = "grep --color=auto";
-      date = "{$pkgs.coreutils}/bin/date";
-      diff = "diff --color=auto";
-      ls = "ls --color=auto -F ";
-      l = "ls";
-      ll = "ls -alFh";
-      la = "ls -A";
-      zz = "z -c"; # restrict matches to subdirs of $PWD
-      hm = "home-manager";
-      ssh-keygen = "ssh-keygen -t rsa -b 4096";
-      dev-server-php = "sh -c 'php -S localhost:8000 & browser-sync start -f . -p localhost:8000 --no-notify & wait'";
-      kitty-beamer = "kitty -o font_size=20 -o macos_quit_when_last_window_closed=yes";
-    };
-  };
-
   programs.zsh = {
     enable = true;
     enableAutosuggestions = true;
@@ -379,7 +355,8 @@ in {
     ];
 
     shellAliases = {
-      code = "code-insiders";
+      git = "/usr/bin/git";
+      zsh = "/usr/bin/zsh";
       g = "git";
       amend = "git add -A && git commit --amend --no-edit";
       grep = "grep --color=auto";
