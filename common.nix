@@ -170,6 +170,13 @@ in {
     pkgs.python38Packages.pip
   ];
 
+  home.sessionVariables = rec {
+    EDITOR = "vim";
+    PATH = "$HOME/.npm-packages/bin:$HOME/.yarn/bin:$PATH";
+    HOMEBREW_NO_ANALYTICS = "1";
+    COMPOSER_MEMORY_LIMIT="4G";
+  };
+
   programs.direnv.enable = true;
   # programs.direnv.enableNixDirenvIntegration = true;
 
@@ -190,7 +197,7 @@ in {
       name = "Fira Code";
     };
     settings = lib.trivial.mergeAttrs kitty-gruvbox-dark {
-      shell = "/home/user/.nix-profile/bin/zsh";
+      shell = "/home/user/.nix-profile/bin/fish";
       allow_hyperlinks = true;
       url_style = "single";
       enable_audio_bell = false;
@@ -328,6 +335,30 @@ in {
     };
   };
 
+  programs.fish = {
+    enable = true;
+
+    shellAliases = {
+      amend = "git add -A && git commit --amend --no-edit";
+    };
+
+    shellAbbrs = {
+      g = "git";
+      grep = "grep --color=auto";
+      date = "{$pkgs.coreutils}/bin/date";
+      diff = "diff --color=auto";
+      ls = "ls --color=auto -F ";
+      l = "ls";
+      ll = "ls -alFh";
+      la = "ls -A";
+      zz = "z -c"; # restrict matches to subdirs of $PWD
+      hm = "home-manager";
+      ssh-keygen = "ssh-keygen -t rsa -b 4096";
+      dev-server-php = "sh -c 'php -S localhost:8000 & browser-sync start -f . -p localhost:8000 --no-notify & wait'";
+      kitty-beamer = "kitty -o font_size=20 -o macos_quit_when_last_window_closed=yes";
+    };
+  };
+
   programs.zsh = {
     enable = true;
     enableAutosuggestions = true;
@@ -367,10 +398,6 @@ in {
 
     sessionVariables = rec {
       PROMPT="%F{245}%~%f %(?..%F{red}[%?]%f )%(!.#.$) ";
-      EDITOR = "vim";
-      PATH = "$HOME/.npm-packages/bin:$HOME/.yarn/bin:$PATH";
-      HOMEBREW_NO_ANALYTICS = "1";
-      COMPOSER_MEMORY_LIMIT="4G";
     };
 
     initExtra = ''
