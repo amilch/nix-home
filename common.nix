@@ -5,7 +5,7 @@ let
 
   LS_COLORS = pkgs.fetchgit {
     url = "https://github.com/trapd00r/LS_COLORS";
-    sha256 = "1vw2iy8sigkhal8b2s20db580gwg904q70b93dqnfpj5zf4pwgnq";
+    sha256 = "1i2pc9k1g79wvdq3w2h3ikp3s2myalcvwin2l6gmyhz5cn0xjfg8";
   };
   ls-colors = pkgs.runCommand "ls-colors" { } ''
     mkdir -p $out/bin/ $out/share
@@ -116,6 +116,11 @@ in {
     }
     '';
 
+
+  home.file.".npmrc".text = ''
+    prefix = ''${HOME}/.npm-packages
+  '';
+
   home.packages = [
     pkgs.shellcheck
     pkgs.mtr
@@ -132,6 +137,7 @@ in {
     pkgs.glances
     pkgs.tealdeer
     pkgs.tor
+    pkgs.nmap
     pkgs.shellcheck
     pkgs.sd
     pkgs.z-lua
@@ -139,6 +145,7 @@ in {
     ls-colors
     pkgs.fzf
     pkgs.poppler_utils
+    pkgs.youtube-dl
 
     pkgs-20-09.ripgrep # currently broken
 
@@ -160,6 +167,7 @@ in {
     pkgs.python38Packages.papis
     pkgs.python38Packages.papis-python-rofi
     pkgs.python38Packages.requests
+    pkgs.python38Packages.pip
   ];
 
   programs.direnv.enable = true;
@@ -360,7 +368,7 @@ in {
     sessionVariables = rec {
       PROMPT="%F{245}%~%f %(?..%F{red}[%?]%f )%(!.#.$) ";
       EDITOR = "vim";
-      PATH = "$HOME/.yarn/bin:$PATH";
+      PATH = "$HOME/.npm-packages/bin:$HOME/.yarn/bin:$PATH";
       HOMEBREW_NO_ANALYTICS = "1";
       COMPOSER_MEMORY_LIMIT="4G";
     };
