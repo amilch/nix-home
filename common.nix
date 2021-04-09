@@ -172,7 +172,8 @@ in {
 
   home.sessionVariables = rec {
     EDITOR = "vim";
-    PATH = "$HOME/.npm-packages/bin:$HOME/.yarn/bin:$PATH";
+    JAVA_HOME = "/opt/jdk-15.0.2";
+    PATH = "$HOME/.npm-packages/bin:$HOME/.yarn/bin:/opt/gradle/bin:$JAVA_HOME/bin:$PATH";
     HOMEBREW_NO_ANALYTICS = "1";
     COMPOSER_MEMORY_LIMIT="4G";
   };
@@ -314,6 +315,7 @@ in {
       hub.protocol = "https";
       github.user = "andreasmilch";
       color.ui = true;
+      merge.tool = "vimdiff";
       merge.conflictstyle = "diff3";
       credential.helper = "osxkeychain";
       diff.algorithm = "patience";
@@ -390,6 +392,9 @@ in {
           ;;
       esac
 
+      # Dirs
+      export htw=~/Sync/HTW
+
       # History Search
       autoload -U up-line-or-beginning-search
       autoload -U down-line-or-beginning-search
@@ -407,6 +412,13 @@ in {
       setopt no_case_glob
       setopt auto_cd
       setopt correct_all
+
+      # URL
+      autoload -Uz url-quote-magic
+      zle -N self-insert url-quote-magic
+      autoload -Uz bracketed-paste-magic
+      zle -N bracketed-paste bracketed-paste-magic
+
 
       # Functions
       function pandoc-pdf {
