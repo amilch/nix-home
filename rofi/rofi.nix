@@ -9,6 +9,7 @@
     font = "Roboto 11";
     extraConfig = ''
       rofi.modi: window,run,drun,ssh,combi
+      rofi.kb-cancel: Super_L,Escape
     '';
   };
 }

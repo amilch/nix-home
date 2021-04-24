@@ -13,6 +13,7 @@
       set termguicolors
       colorscheme gruvbox
 
+      set title
       set number
       set autoindent  " already default in vim-sensible
       set expandtab
