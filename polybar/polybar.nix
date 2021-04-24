@@ -1,6 +1,8 @@
 { pkgs, ... }:
 
 {
+  home.file.".config/polybar/info-hlwm-workspaces.sh".source = ./info-hlwm-workspaces.sh;
+
   services.polybar = {
     enable = true;
     package = pkgs.polybarFull;
