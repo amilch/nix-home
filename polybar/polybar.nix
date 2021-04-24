@@ -1,7 +1,23 @@
 { pkgs, ... }:
 
-{
-  home.file.".config/polybar/info-hlwm-workspaces.sh".source = ./info-hlwm-workspaces.sh;
+let
+  POLYBAR_SCRIPTS = pkgs.fetchgit {
+    url = "https://github.com/polybar/polybar-scripts";
+    sha256 = "02grwrah7vk6ahbssxbmbml88804dykgvvv2vc33gyi69aj5zv93";
+  };
+  POLYBAR_SPOTIFY = pkgs.fetchgit {
+    url = "https://github.com/Jvanrhijn/polybar-spotify";
+    sha256 = "036z2w52a6a13jvyvxzr320fj3w1shgs0b1gkvnm6rp3ir3h288y";
+  };
+
+
+in {
+  home.file.".config/polybar/info-hlwm-workspaces.sh" = {
+    text = builtins.replaceStrings ["# TODO Add your formatting tags for focused workspaces"] ["echo '%{F#ef6b7b}'"] (builtins.readFile "${POLYBAR_SCRIPTS}/polybar-scripts/info-hlwm-workspaces/info-hlwm-workspaces.sh");
+    executable = true;
+  };
+
+  home.file.".config/polybar/spotify_status.py".source = "${POLYBAR_SPOTIFY}/spotify_status.py";
 
   services.polybar = {
     enable = true;
