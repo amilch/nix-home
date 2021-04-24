@@ -1,7 +1,12 @@
 { pkgs, ... }:
 
 {
-  imports = [ ./common.nix ];
+  imports = [
+    ./common.nix
+    ./polybar/polybar.nix
+    ./rofi/rofi.nix
+    ./herbstluftwm/herbstluftwm.nix
+  ];
 
   home.username = "user";
   home.homeDirectory = "/home/user";
@@ -10,15 +15,5 @@
   
   programs.zsh.shellAliases = {
     kitty = "/usr/bin/kitty";
-  };
-
-  programs.rofi = {
-    enable = true;
-    theme = "slate";
-    extraConfig = ''
-      rofi.modi: window,run,drun,ssh
-      rofi.lines: 3
-      rofi.font: Roboto 11
-    '';
   };
 }
